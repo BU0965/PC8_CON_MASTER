@@ -388,7 +388,7 @@
         </header>
 
         <div class="status-bar">
-            <span id="visible-columns-count">12 columns visible</span>
+            <span id="visible-columns-count">8 columns visible</span>
             <span id="total-rows-count">12 rows</span>
             <span id="import-status">Ready to import</span>
         </div>
@@ -563,8 +563,17 @@
             "SLOT3 UNITS"
         ];
 
-        // Initialize visible columns (first 12 columns visible by default)
-        let visibleColumns = allColumns.slice(0, 12);
+        // Initialize visible columns with the requested default columns
+        let visibleColumns = [
+            "CONSUMER NUMBER",
+            "CONSUMER_NAME",
+            "CONS. TYPE",
+            "TARIFF CAT",
+            "SERIAL NUMBER",
+            "CURRENT READING",
+            "PREVIOUS READING",
+            "UNITS KWH"
+        ];
 
         // GitHub Repository URL - तुमचा URL येथे सेट करा
         const GITHUB_REPO_URL = "https://bu0965.github.io/PC8_CON_MASTER/";
@@ -1020,5 +1029,6 @@
     </script>
 </body>
 </html>
+
 
 
