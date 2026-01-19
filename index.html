@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PC8 Consumer Master</title>
+    <title>PC8_CON_MASTER</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
@@ -41,9 +41,65 @@
             font-weight: 600;
         }
 
-        .controls {
+        .header-controls {
             display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .year-slider-container {
+            display: flex;
+            align-items: center;
             gap: 10px;
+            background-color: #34495e;
+            padding: 8px 15px;
+            border-radius: 4px;
+        }
+
+        .year-slider-container label {
+            font-weight: 500;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .year-slider {
+            width: 200px;
+            height: 6px;
+            -webkit-appearance: none;
+            background: #7f8c8d;
+            border-radius: 3px;
+            outline: none;
+        }
+
+        .year-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #3498db;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .year-slider::-webkit-slider-thumb:hover {
+            background: #2980b9;
+        }
+
+        .year-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #3498db;
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+
+        .year-indicator {
+            font-weight: 600;
+            font-size: 16px;
+            color: #3498db;
+            min-width: 50px;
+            text-align: center;
         }
 
         button {
@@ -109,6 +165,25 @@
             background-color: #ecf0f1;
             font-weight: bold;
             color: #2c3e50;
+        }
+
+        .year-header {
+            background-color: #2c3e50;
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            padding: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 5;
+        }
+
+        .year-2025 {
+            background-color: #3498db;
+        }
+
+        .year-2026 {
+            background-color: #9b59b6;
         }
 
         .input-row td {
@@ -376,20 +451,80 @@
             opacity: 0.7;
             pointer-events: none;
         }
+
+        .slider-legend {
+            display: flex;
+            justify-content: space-between;
+            width: 200px;
+            margin-top: 5px;
+            font-size: 12px;
+            color: #7f8c8d;
+        }
+
+        .year-tabs {
+            display: none;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .year-slider-container {
+                display: none;
+            }
+
+            .year-tabs {
+                display: flex;
+            }
+
+            .year-tab {
+                flex: 1;
+                padding: 10px;
+                text-align: center;
+                background-color: #34495e;
+                color: white;
+                cursor: pointer;
+                border-radius: 4px 4px 0 0;
+                transition: background-color 0.2s;
+            }
+
+            .year-tab.active {
+                background-color: #3498db;
+                font-weight: bold;
+            }
+
+            .year-tab:first-child {
+                margin-right: 2px;
+            }
+
+            .year-tab:hover {
+                background-color: #2980b9;
+            }
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <h1>PC8 Consumer Master</h1>
-            <div class="controls">
+            <h1>PC8_CON_MASTER</h1>
+            <div class="header-controls">
+                <div class="year-slider-container">
+                    <label for="year-slider">Year:</label>
+                    <input type="range" id="year-slider" class="year-slider" min="2025" max="2026" step="1" value="2025">
+                    <div class="year-indicator" id="year-indicator">2025</div>
+                </div>
                 <button id="column-toggle">Toggle Columns</button>
             </div>
         </header>
 
+        <!-- Year tabs for mobile view -->
+        <div class="year-tabs" id="year-tabs">
+            <div class="year-tab active" data-year="2025">2025</div>
+            <div class="year-tab" data-year="2026">2026</div>
+        </div>
+
         <div class="status-bar">
             <span id="visible-columns-count">8 columns visible</span>
             <span id="total-rows-count">12 rows</span>
+            <span id="year-display">Year: 2025</span>
             <span id="import-status">Ready to import</span>
         </div>
 
@@ -397,18 +532,40 @@
             <div class="progress-bar" id="progress-bar">0%</div>
         </div>
 
-        <div class="data-container">
-            <table id="data-table">
+        <!-- Year 2025 Table Container -->
+        <div class="data-container year-container" id="year-2025-container">
+            <div class="year-header year-2025">2025 Data</div>
+            <table id="data-table-2025">
                 <thead>
-                    <tr id="table-header">
+                    <tr id="table-header-2025">
                         <!-- Header will be populated by JavaScript -->
                     </tr>
                 </thead>
-                <tbody id="table-body">
+                <tbody id="table-body-2025">
                     <!-- Monthly rows will be populated by JavaScript -->
                 </tbody>
                 <tfoot>
-                    <tr id="input-row" class="input-row">
+                    <tr id="input-row-2025" class="input-row">
+                        <!-- Input row will be populated by JavaScript -->
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <!-- Year 2026 Table Container -->
+        <div class="data-container year-container" id="year-2026-container" style="display: none;">
+            <div class="year-header year-2026">2026 Data</div>
+            <table id="data-table-2026">
+                <thead>
+                    <tr id="table-header-2026">
+                        <!-- Header will be populated by JavaScript -->
+                    </tr>
+                </thead>
+                <tbody id="table-body-2026">
+                    <!-- Monthly rows will be populated by JavaScript -->
+                </tbody>
+                <tfoot>
+                    <tr id="input-row-2026" class="input-row">
                         <!-- Input row will be populated by JavaScript -->
                     </tr>
                 </tfoot>
@@ -575,16 +732,18 @@
             "UNITS KWH"
         ];
 
-        // GitHub Repository URL - तुमचा URL येथे सेट करा
-        const GITHUB_REPO_URL = "https://bu0965.github.io/PC8_CON_MASTER/";
+        // Current selected year
+        let currentYear = 2025;
 
-        // Generate months in format 202501, 202502, etc.
-        function generateMonths() {
+        // GitHub Repository URL
+        const GITHUB_REPO_URL = "https://bu0965.github.io/PC8_CON_MASTER";
+
+        // Generate months for a specific year
+        function generateMonths(year) {
             const months = [];
-            const currentYear = new Date().getFullYear();
             for (let i = 1; i <= 12; i++) {
                 const month = i < 10 ? `0${i}` : `${i}`;
-                months.push(`${currentYear}${month}`);
+                months.push(`${year}${month}`);
             }
             return months;
         }
@@ -594,6 +753,7 @@
             document.getElementById('visible-columns-count').textContent =
                 `${visibleColumns.length} columns visible`;
             document.getElementById('total-rows-count').textContent = '12 rows';
+            document.getElementById('year-display').textContent = `Year: ${currentYear}`;
         }
 
         // Show notification
@@ -654,11 +814,12 @@
             }
         }
 
-        // Initialize the table
-        function initializeTable() {
-            const tableHeader = document.getElementById('table-header');
-            const tableBody = document.getElementById('table-body');
-            const inputRow = document.getElementById('input-row');
+        // Initialize table for a specific year
+        function initializeTable(year) {
+            const yearSuffix = `-${year}`;
+            const tableHeader = document.getElementById(`table-header${yearSuffix}`);
+            const tableBody = document.getElementById(`table-body${yearSuffix}`);
+            const inputRow = document.getElementById(`input-row${yearSuffix}`);
 
             // Clear existing content
             tableHeader.innerHTML = '';
@@ -681,11 +842,12 @@
             });
 
             // Generate 12 monthly rows
-            const months = generateMonths();
+            const months = generateMonths(year);
             months.forEach(month => {
                 const row = document.createElement('tr');
                 row.className = 'month-row';
                 row.dataset.month = month;
+                row.dataset.year = year;
 
                 // Add month cell
                 const monthCell = document.createElement('td');
@@ -722,12 +884,47 @@
                 const input = document.createElement('input');
                 input.type = 'text';
                 input.placeholder = '';
+                input.dataset.column = column;
                 inputCell.appendChild(input);
                 inputRow.appendChild(inputCell);
             });
+        }
 
+        // Initialize all tables (2025 and 2026)
+        function initializeAllTables() {
+            initializeTable(2025);
+            initializeTable(2026);
             updateStatusBar();
             updateImportStatus('Ready to import');
+        }
+
+        // Switch between years
+        function switchYear(year) {
+            currentYear = year;
+
+            // Update slider indicator
+            document.getElementById('year-slider').value = year;
+            document.getElementById('year-indicator').textContent = year;
+
+            // Update year tabs
+            document.querySelectorAll('.year-tab').forEach(tab => {
+                if (parseInt(tab.dataset.year) === year) {
+                    tab.classList.add('active');
+                } else {
+                    tab.classList.remove('active');
+                }
+            });
+
+            // Show/hide year containers
+            document.querySelectorAll('.year-container').forEach(container => {
+                if (container.id === `year-${year}-container`) {
+                    container.style.display = 'block';
+                } else {
+                    container.style.display = 'none';
+                }
+            });
+
+            updateStatusBar();
         }
 
         // Initialize column modal
@@ -771,11 +968,11 @@
                 visibleColumns = [allColumns[0]];
             }
 
-            initializeTable();
+            initializeAllTables();
             closeModal();
         }
 
-        // Export data to Excel
+        // Export data to Excel for current year
         function exportToExcel() {
             try {
                 // Create workbook
@@ -788,8 +985,8 @@
                 const headers = ['Month', ...visibleColumns];
                 exportData.push(headers);
 
-                // Add data rows
-                const tableBody = document.getElementById('table-body');
+                // Add data rows for current year
+                const tableBody = document.getElementById(`table-body-${currentYear}`);
                 const rows = tableBody.querySelectorAll('tr');
 
                 rows.forEach(row => {
@@ -807,12 +1004,12 @@
                 const ws = XLSX.utils.aoa_to_sheet(exportData);
 
                 // Add worksheet to workbook
-                XLSX.utils.book_append_sheet(wb, ws, 'Data');
+                XLSX.utils.book_append_sheet(wb, ws, `Data ${currentYear}`);
 
                 // Generate Excel file and trigger download
-                XLSX.writeFile(wb, `customer_data_${document.getElementById('import-value').value || 'export'}.xlsx`);
+                XLSX.writeFile(wb, `customer_data_${currentYear}_${document.getElementById('import-value').value || 'export'}.xlsx`);
 
-                showNotification('Data exported successfully!');
+                showNotification(`Data for ${currentYear} exported successfully!`);
             } catch (error) {
                 console.error('Export error:', error);
                 showNotification('Error exporting data: ' + error.message, true);
@@ -828,7 +1025,6 @@
         // Fetch file from GitHub repository
         async function fetchFileFromGitHub(filePath) {
             try {
-                // GitHub Pages साठी direct URL वापरा
                 const fileUrl = `${GITHUB_REPO_URL}/${filePath}`;
                 console.log('Fetching file from:', fileUrl);
 
@@ -848,11 +1044,9 @@
         // Get list of files from GitHub repository
         async function getFilesFromGitHub() {
             try {
-                // GitHub Pages साठी files.json वापरा किंवा hardcode file list
-                // किंवा तुमच्या repository मध्ये files.json file तयार करा ज्यामध्ये सर्व Excel files ची यादी असेल
-
-                // Hardcoded file list - तुमच्या actual file names ने बदला
+                // Hardcoded file list for both years
                 const excelFiles = [
+                    // 2025 files
                     { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202501.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202501.xls" },
                     { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202502.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202502.xls" },
                     { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202503.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202503.xls" },
@@ -864,7 +1058,21 @@
                     { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202509.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202509.xls" },
                     { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202510.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202510.xls" },
                     { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202511.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202511.xls" },
-                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202512.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202512.xls" }
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202512.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202512.xls" },
+
+                    // 2026 files (assuming similar naming convention)
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202601.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202601.xls" },
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202602.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202602.xls" },
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202603.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202603.xls" },
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202604.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202604.xls" },
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202605.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202605.xls" },
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202606.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202606.xls" },
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202607.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202607.xls" },
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202608.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202608.xls" },
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202609.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202609.xls" },
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202610.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202610.xls" },
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202611.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202611.xls" },
+                    { name: "PC_CONSUMERS_MASTER_LIST_0965_08_202612.xls", path: "PC_CONSUMERS_MASTER_LIST_0965_08_202612.xls" }
                 ];
 
                 return excelFiles;
@@ -893,7 +1101,8 @@
                 updateProgress(10, `Found ${files.length} Excel files`);
 
                 let processedFiles = 0;
-                let foundData = false;
+                let foundDataFor2025 = false;
+                let foundDataFor2026 = false;
 
                 for (const file of files) {
                     try {
@@ -928,23 +1137,30 @@
                             }
 
                             if (customerRow) {
+                                // Determine year from month (first 4 digits)
+                                const year = parseInt(month.substring(0, 4));
+
                                 // Find the row for this month in our table
-                                const tableBody = document.getElementById('table-body');
-                                const targetRow = tableBody.querySelector(`tr[data-month="${month}"]`);
+                                const tableBody = document.getElementById(`table-body-${year}`);
+                                if (tableBody) {
+                                    const targetRow = tableBody.querySelector(`tr[data-month="${month}"]`);
 
-                                if (targetRow) {
-                                    const cells = targetRow.querySelectorAll('td');
+                                    if (targetRow) {
+                                        const cells = targetRow.querySelectorAll('td');
 
-                                    // Update data cells
-                                    visibleColumns.forEach((column, cellIndex) => {
-                                        const columnIndex = headers.indexOf(column);
-                                        if (columnIndex !== -1 && customerRow[columnIndex] !== undefined) {
-                                            cells[cellIndex + 1].textContent = customerRow[columnIndex];
-                                        }
-                                    });
+                                        // Update data cells
+                                        visibleColumns.forEach((column, cellIndex) => {
+                                            const columnIndex = headers.indexOf(column);
+                                            if (columnIndex !== -1 && customerRow[columnIndex] !== undefined) {
+                                                cells[cellIndex + 1].textContent = customerRow[columnIndex];
+                                            }
+                                        });
 
-                                    highlightRow(targetRow);
-                                    foundData = true;
+                                        highlightRow(targetRow);
+
+                                        if (year === 2025) foundDataFor2025 = true;
+                                        if (year === 2026) foundDataFor2026 = true;
+                                    }
                                 }
                             }
                         }
@@ -959,13 +1175,22 @@
                 setLoadingState(false);
                 updateProgress(100, 'Import complete');
 
-                if (foundData) {
-                    showNotification(`Data imported for customer ${customerNumber} across all months!`);
-                    updateImportStatus(`Data imported for ${customerNumber}`);
+                let message = '';
+                if (foundDataFor2025 && foundDataFor2026) {
+                    message = `Data imported for customer ${customerNumber} for both 2025 and 2026!`;
+                } else if (foundDataFor2025) {
+                    message = `Data imported for customer ${customerNumber} for 2025 only`;
+                } else if (foundDataFor2026) {
+                    message = `Data imported for customer ${customerNumber} for 2026 only`;
                 } else {
-                    showNotification(`No data found for customer ${customerNumber} in any files`, true);
+                    message = `No data found for customer ${customerNumber} in any files`;
+                    showNotification(message, true);
                     updateImportStatus('No data found');
+                    return;
                 }
+
+                showNotification(message);
+                updateImportStatus(`Data imported for ${customerNumber}`);
             } catch (error) {
                 console.error('Error importing data from GitHub:', error);
                 showNotification('Error importing data: ' + error.message, true);
@@ -1014,6 +1239,20 @@
             importAllMonthsDataFromGitHub(customerNumber);
         });
 
+        // Year slider event
+        document.getElementById('year-slider').addEventListener('input', (e) => {
+            const year = parseInt(e.target.value);
+            switchYear(year);
+        });
+
+        // Year tab events (for mobile)
+        document.querySelectorAll('.year-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                const year = parseInt(tab.dataset.year);
+                switchYear(year);
+            });
+        });
+
         // Close modal when clicking outside
         window.addEventListener('click', (event) => {
             const modal = document.getElementById('column-modal');
@@ -1024,11 +1263,9 @@
 
         // Initialize the application
         document.addEventListener('DOMContentLoaded', () => {
-            initializeTable();
+            initializeAllTables();
+            switchYear(2025);
         });
     </script>
 </body>
 </html>
-
-
-
